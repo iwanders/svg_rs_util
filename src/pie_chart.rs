@@ -4,7 +4,7 @@ use std::f64::consts::PI;
 
 
 // https://davidmathlogic.com/colorblind/
-const FALLBACK_COLORS: [&'static str; 4] = [
+const FALLBACK_COLORS: [&str; 4] = [
     "#D81B60",
     "#1E88E5",
     "#FFC107",
@@ -14,31 +14,28 @@ const FALLBACK_COLORS: [&'static str; 4] = [
 
 #[derive(Debug, Clone, Default)]
 pub struct PieSegment {
+    /// The ratio this segment depicts, between 0.0 and 1.0.
     pub ratio: f64,
+    /// The color to use for this segment, if empty fallback colors are used.
     pub color: String,
 }
 
-impl PieSegment {
-    pub fn set_color(&mut self, color: &str) {
-        self.color = color.to_owned();
-    }
-    pub fn set_ratio(&mut self, ratio: f64) {
-        self.ratio = ratio;
-    }
-}
-
 impl From<f64> for PieSegment {
-    fn from(v: f64) -> Self {
-        let mut s = PieSegment::default();
-        s.set_ratio(v);
-        s
+    fn from(ratio: f64) -> Self {
+        PieSegment{
+            ratio,
+            color: String::new(),
+        }
     }
 }
 
 
+/// Style for positioning of the start segment.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum StartStyle {
+    /// The edge of the first segment is aligned with the start offset.
     Edge,
+    /// The center of the first segment is aligned with the start offset.
     Centered,
 }
 
@@ -53,7 +50,7 @@ impl Default for PieChart {
     fn default() -> Self {
         Self {
             segments: vec![],
-            radius: 100.0,
+            radius: 1.0,
             start_offset: 0.0,
             start_style: StartStyle::Edge,
         }
@@ -64,6 +61,8 @@ impl PieChart {
     pub fn new() -> Self {
         Default::default()
     }
+
+    /// Set the radius.
     pub fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
     }
@@ -74,17 +73,19 @@ impl PieChart {
         self.start_style = style;
     }
 
+    /// Set the segments in this chart.
     pub fn set_segments<T: Into<PieSegment> + Clone>(&mut self, segments: &[T])  {
-        self.segments = segments.into_iter().map(|z| Into::<PieSegment>::into(z.clone())).collect();
+        self.segments = segments.iter().map(|z| Into::<PieSegment>::into(z.clone())).collect();
     }
 
+    /// Mutable retrieval of a segment.
     pub fn segment_mut(&mut self, index: usize) -> Option<&mut PieSegment> {
         self.segments.get_mut(index)
     }
+
+    /// Render the piechart to svg.
     pub fn svg(&self) -> Group {
         let mut group = Group::new();
-
-        
 
         let mut current_pos: f64 = self.start_offset;
 
