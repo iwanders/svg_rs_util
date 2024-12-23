@@ -2,8 +2,6 @@
 use svg::node::element::{Group, Path, path::Data};
 use std::f64::consts::PI;
 
-const FULL_CIRCLE_DEGREES: f64 = 360.0; // Why is this all in degrees!?
-const RAD_TO_DEG:f64 = 2.0 * PI / FULL_CIRCLE_DEGREES;
 
 // https://davidmathlogic.com/colorblind/
 const FALLBACK_COLORS: [&'static str; 4] = [
@@ -16,8 +14,8 @@ const FALLBACK_COLORS: [&'static str; 4] = [
 
 #[derive(Debug, Clone, Default)]
 pub struct PieSegment {
-    ratio: f64,
-    color: String,
+    pub ratio: f64,
+    pub color: String,
 }
 
 impl PieSegment {
@@ -38,16 +36,26 @@ impl From<f64> for PieSegment {
 }
 
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum StartStyle {
+    Edge,
+    Centered,
+}
+
 #[derive(Debug, Clone)]
 pub struct PieChart {
     segments: Vec<PieSegment>,
     radius: f64,
+    start_offset: f64,
+    start_style: StartStyle,
 }
 impl Default for PieChart {
     fn default() -> Self {
         Self {
             segments: vec![],
             radius: 100.0,
+            start_offset: 0.0,
+            start_style: StartStyle::Edge,
         }
     }
 }
@@ -55,6 +63,15 @@ impl Default for PieChart {
 impl PieChart {
     pub fn new() -> Self {
         Default::default()
+    }
+    pub fn set_radius(&mut self, radius: f64) {
+        self.radius = radius;
+    }
+
+    /// Normally, start is from 3 o clock clockwise.
+    pub fn set_start(&mut self, offset: f64, style: StartStyle) {
+        self.start_offset = offset;
+        self.start_style = style;
     }
 
     pub fn set_segments<T: Into<PieSegment> + Clone>(&mut self, segments: &[T])  {
@@ -67,7 +84,16 @@ impl PieChart {
     pub fn svg(&self) -> Group {
         let mut group = Group::new();
 
-        let mut current_pos: f64 = 0.0;
+        
+
+        let mut current_pos: f64 = self.start_offset;
+
+        // If we have a centered style, subtract by half of the first ratio.
+        if self.start_style == StartStyle::Centered {
+            if let Some(s) = self.segments.first() {
+                current_pos -= (s.ratio / 2.0) * 2.0 * PI;
+            }
+        }
         for (si, s) in self.segments.iter().enumerate() {
             let angle = s.ratio * 2.0 * PI;
             let arc_sx = (current_pos).cos() * self.radius;
@@ -77,19 +103,12 @@ impl PieChart {
             let data = Data::new()
                 .move_to((0.0, 0.0)) // all circles start in 0,0
                 .line_to((arc_sx, arc_sy))
-                // .line_to(((angle*0.2 + current_pos).cos() * self.radius, (angle*0.2 + current_pos).sin() * self.radius))
-                // .line_to(((angle*0.4 + current_pos).cos() * self.radius, (angle*0.4 + current_pos).sin() * self.radius))
-                // .line_to(((angle*0.6 + current_pos).cos() * self.radius, (angle*0.6 + current_pos).sin() * self.radius))
-                // .line_to(((angle*0.8 + current_pos).cos() * self.radius, (angle*0.8 + current_pos).sin() * self.radius))
-                // .line_to(((angle*1.0 + current_pos).cos() * self.radius, (angle*1.0 + current_pos).sin() * self.radius))
-                // .line_to((x_end, y_high))
                 .elliptical_arc_by((
                     self.radius, self.radius,
                     0.0,  // x axis rotation of the ellipse
                     0, 1, // large flag arc, sweep flag
                     arc_ex - arc_sx, arc_ey - arc_sy))
                 .line_to((arc_ex, arc_ey))
-                .line_to((0.0, 0.0))
                 .close();
             
             current_pos += angle;
@@ -107,6 +126,7 @@ impl PieChart {
         }
         group
     }
+
 }
 
     
