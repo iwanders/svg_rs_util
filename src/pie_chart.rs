@@ -77,17 +77,17 @@ impl PieChart {
             let data = Data::new()
                 .move_to((0.0, 0.0)) // all circles start in 0,0
                 .line_to((arc_sx, arc_sy))
-                .line_to(((angle*0.2 + current_pos).cos() * self.radius, (angle*0.2 + current_pos).sin() * self.radius))
-                .line_to(((angle*0.4 + current_pos).cos() * self.radius, (angle*0.4 + current_pos).sin() * self.radius))
-                .line_to(((angle*0.6 + current_pos).cos() * self.radius, (angle*0.6 + current_pos).sin() * self.radius))
-                .line_to(((angle*0.8 + current_pos).cos() * self.radius, (angle*0.8 + current_pos).sin() * self.radius))
-                .line_to(((angle*1.0 + current_pos).cos() * self.radius, (angle*1.0 + current_pos).sin() * self.radius))
+                // .line_to(((angle*0.2 + current_pos).cos() * self.radius, (angle*0.2 + current_pos).sin() * self.radius))
+                // .line_to(((angle*0.4 + current_pos).cos() * self.radius, (angle*0.4 + current_pos).sin() * self.radius))
+                // .line_to(((angle*0.6 + current_pos).cos() * self.radius, (angle*0.6 + current_pos).sin() * self.radius))
+                // .line_to(((angle*0.8 + current_pos).cos() * self.radius, (angle*0.8 + current_pos).sin() * self.radius))
+                // .line_to(((angle*1.0 + current_pos).cos() * self.radius, (angle*1.0 + current_pos).sin() * self.radius))
                 // .line_to((x_end, y_high))
-                // .elliptical_arc_by((
-                    // self.radius, self.radius,
-                    // current_pos * RAD_TO_DEG,  // current x axis rotation
-                    // 1, 1, // large flag arc, sweep flag
-                    // arc_sx - arc_sx, arc_ey - arc_sy))
+                .elliptical_arc_by((
+                    self.radius, self.radius,
+                    0.0,  // x axis rotation of the ellipse
+                    0, 1, // large flag arc, sweep flag
+                    arc_ex - arc_sx, arc_ey - arc_sy))
                 .line_to((arc_ex, arc_ey))
                 .line_to((0.0, 0.0))
                 .close();
