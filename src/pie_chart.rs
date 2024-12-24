@@ -1,16 +1,8 @@
-
-use svg::node::element::{Group, Path, path::Data};
 use std::f64::consts::PI;
-
+use svg::node::element::{path::Data, Group, Path};
 
 // https://davidmathlogic.com/colorblind/
-const FALLBACK_COLORS: [&str; 4] = [
-    "#D81B60",
-    "#1E88E5",
-    "#FFC107",
-    "#004D40",
-];
-
+const FALLBACK_COLORS: [&str; 4] = ["#D81B60", "#1E88E5", "#FFC107", "#004D40"];
 
 #[derive(Debug, Clone, Default)]
 pub struct PieSegment {
@@ -22,13 +14,12 @@ pub struct PieSegment {
 
 impl From<f64> for PieSegment {
     fn from(ratio: f64) -> Self {
-        PieSegment{
+        PieSegment {
             ratio,
             color: String::new(),
         }
     }
 }
-
 
 /// Style for positioning of the start segment.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -74,8 +65,11 @@ impl PieChart {
     }
 
     /// Set the segments in this chart.
-    pub fn set_segments<T: Into<PieSegment> + Clone>(&mut self, segments: &[T])  {
-        self.segments = segments.iter().map(|z| Into::<PieSegment>::into(z.clone())).collect();
+    pub fn set_segments<T: Into<PieSegment> + Clone>(&mut self, segments: &[T]) {
+        self.segments = segments
+            .iter()
+            .map(|z| Into::<PieSegment>::into(z.clone()))
+            .collect();
     }
 
     /// Mutable retrieval of a segment.
@@ -105,13 +99,17 @@ impl PieChart {
                 .move_to((0.0, 0.0)) // all circles start in 0,0
                 .line_to((arc_sx, arc_sy))
                 .elliptical_arc_by((
-                    self.radius, self.radius,
-                    0.0,  // x axis rotation of the ellipse
-                    0, 1, // large flag arc, sweep flag
-                    arc_ex - arc_sx, arc_ey - arc_sy))
+                    self.radius,
+                    self.radius,
+                    0.0, // x axis rotation of the ellipse
+                    0,
+                    1, // large flag arc, sweep flag
+                    arc_ex - arc_sx,
+                    arc_ey - arc_sy,
+                ))
                 .line_to((arc_ex, arc_ey))
                 .close();
-            
+
             current_pos += angle;
             let color = if s.color.is_empty() {
                 FALLBACK_COLORS[si % FALLBACK_COLORS.len()].to_owned()
@@ -127,7 +125,4 @@ impl PieChart {
         }
         group
     }
-
 }
-
-    

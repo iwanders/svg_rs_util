@@ -1,6 +1,5 @@
-use svg_util::pie_chart::{PieChart, StartStyle};
 use std::f64::consts::PI;
-
+use svg_util::pie_chart::{PieChart, StartStyle};
 
 fn make_piechart() {
     let mut z = PieChart::new();
@@ -13,10 +12,9 @@ fn make_piechart() {
     // 12 o clock
     z.set_start(-PI / 2.0, StartStyle::Edge);
 
-    
-    use svg::Document;
-    use svg::node::element::Path;
     use svg::node::element::path::Data;
+    use svg::node::element::Path;
+    use svg::Document;
 
     z.set_segments(&[0.15, 0.3, 0.4, 0.15]);
 
@@ -27,9 +25,7 @@ fn make_piechart() {
         .line_to((-1000, -1000))
         .close();
 
-    let path = Path::new()
-        .set("fill", "black")
-        .set("d", data);
+    let path = Path::new().set("fill", "black").set("d", data);
 
     let document = Document::new()
         .set("viewBox", (-200, -200, 400, 400)) // from -200,-200, width and height of 400.
@@ -40,7 +36,6 @@ fn make_piechart() {
     let document = document.add(z.svg());
 
     svg::save("/tmp/test_pie_chart.svg", &document).expect("failed to write svg");
-
 }
 
 fn main() {
