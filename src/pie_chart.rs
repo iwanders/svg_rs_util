@@ -27,7 +27,9 @@ pub enum StartStyle {
     /// The edge of the first segment is aligned with the start offset.
     Edge,
     /// The center of the first segment is aligned with the start offset.
-    Centered,
+    Center,
+    /// Center the largest segment to its direction if all pieces are equal, still offset by start.
+    CenterLargest,
 }
 
 #[derive(Debug, Clone)]
@@ -84,11 +86,37 @@ impl PieChart {
         let mut current_pos: f64 = self.start_offset;
 
         // If we have a centered style, subtract by half of the first ratio.
-        if self.start_style == StartStyle::Centered {
-            if let Some(s) = self.segments.first() {
-                current_pos -= (s.ratio / 2.0) * 2.0 * PI;
+        match self.start_style {
+            StartStyle::Edge => {}
+            StartStyle::Center => {
+                if let Some(s) = self.segments.first() {
+                    current_pos -= (s.ratio / 2.0) * 2.0 * PI;
+                }
+            }
+            StartStyle::CenterLargest => {
+                // Approach:
+                // Assume all segments are equal.
+                // Align the largest part to its centered-equal direction.
+                let ideal = 1.0f64 / (self.segments.len() as f64);
+                // https://stackoverflow.com/a/53908709
+                let max_segment: Option<(usize, &PieSegment)> = self
+                    .segments
+                    .iter()
+                    .enumerate()
+                    .max_by(|(_, a), (_, b)| a.ratio.total_cmp(&b.ratio));
+                if let Some((max_index, max_segment)) = max_segment {
+                    // Calculate position of the center of the max segment in ideal position.
+                    let max_segment_ideal = max_index as f64 * ideal + ideal / 2.0;
+                    // Calculate the position of the center of the max segment in reality, accumulating ratios.
+                    let max_segment_real =
+                        (0..max_index).map(|i| self.segments[i].ratio).sum::<f64>()
+                            + max_segment.ratio / 2.0;
+                    // Ofset it by the difference.
+                    current_pos = (max_segment_ideal - max_segment_real) * 2.0 * PI;
+                }
             }
         }
+
         for (si, s) in self.segments.iter().enumerate() {
             let angle = s.ratio * 2.0 * PI;
             let arc_sx = (current_pos).cos() * self.radius;
