@@ -78,7 +78,6 @@ fn make_tab() {
             .set("stroke", "red")
             .set("fill", "none"),
     );
-
     let document = document.add(
         Tab::new()
             .sized(50.0, 80.0)
@@ -100,7 +99,83 @@ fn make_tab() {
             .svg()
             .set("stroke", "white")
             .set("fill", "none")
-            .translated_xy(60.0, 0.0),
+            .translated_xy(80.0, 0.0),
+    );
+    let document = document.add(
+        Tab::new()
+            .sized(50.0, 80.0)
+            .radius(2.0)
+            .tab(5.0, 25.0)
+            .tab_position(15.0)
+            .tab_edge(TabEdge::Right)
+            .svg()
+            .set("stroke", "blue")
+            .set("fill", "none")
+            .translated_xy(80.0, 0.0),
+    );
+
+    let document = document.add(
+        Tab::new()
+            .sized(50.0, 80.0)
+            .radius(2.0)
+            .tab(5.0, 25.0)
+            .tab_position(0.0)
+            .tab_edge(TabEdge::Right)
+            .svg()
+            .set("stroke", "red")
+            .set("fill", "none")
+            .translated_xy(-80.0, 0.0),
+    );
+    let document = document.add(
+        Tab::new()
+            .sized(50.0, 80.0)
+            .radius(2.0)
+            .tab(5.0, 25.0)
+            .tab_position(4.0)
+            .tab_edge(TabEdge::Right)
+            .svg()
+            .set("stroke", "magenta")
+            .set("fill", "none")
+            .translated_xy(-80.0, 0.0),
+    );
+
+    // This breaks, it cannot do zero sized tabs.
+    let document = document.add(
+        Tab::new()
+            .sized(50.0, 80.0)
+            .radius(5.0)
+            .tab(0.0, 0.0)
+            .tab_position(0.0)
+            .tab_edge(TabEdge::Right)
+            .svg()
+            .set("stroke", "orange")
+            .set("fill", "none")
+            .translated_xy(-80.0, -90.0),
+    );
+
+    let document = document.add(
+        Tab::new()
+            .sized(50.0, 80.0)
+            .radius(5.0)
+            .tab(10.0, 20.0)
+            .tab_position(30.0)
+            .tab_edge(TabEdge::Right)
+            .svg()
+            .set("stroke", "green")
+            .set("fill", "none")
+            .translated_xy(80.0, -90.0),
+    );
+    let document = document.add(
+        Tab::new()
+            .sized(50.0, 80.0)
+            .radius(5.0)
+            .tab(10.0, 20.0)
+            .tab_position(60.0)
+            .tab_edge(TabEdge::Right)
+            .svg()
+            .set("stroke", "purple")
+            .set("fill", "none")
+            .translated_xy(80.0, -90.0),
     );
 
     svg::save("/tmp/test_tab.svg", &document).expect("failed to write svg");

@@ -29,8 +29,8 @@ https://yqnn.github.io/svg-path-editor/#P=M_25_0_L_260_0_A_20_20_0_0_1_280_20_V_
 
 #[derive(Clone, Copy, Default)]
 pub enum TabEdge {
-    Left,
     #[default]
+    Left,
     Right,
     Top,
     Bottom,
@@ -83,7 +83,7 @@ impl Tab {
         // let tab_w_straight = self.tab_width - r * 2.0;
 
         // M 25 0 L 260 0 A 20 20 0 0 1 280 20 V 160 A 20 20 0 0 1 260 180 L 20 180 A 20 20 0 0 1 0 160 L 0 140 A 20 20 0 0 0 -20 120 L -50 120 A 20 20 0 0 1 -70 100 L -70 80 A 20 20 0 0 1 -50 60 L -20 60 A 20 20 0 0 0 0 40 L 0 20 A 20 20 0 0 1 20 0 Z
-        let data = Data::new()
+        let mut data = Data::new()
             .move_to((r, 0.0)) // start at radius offset
             .line_to((self.width -  r, 0.0)) // straight line at top to first curve.
             .elliptical_arc_to((
@@ -103,26 +103,40 @@ impl Tab {
                 self.height,
             ))
             .line_to((r, self.height)) // straight line to third curve
-            .elliptical_arc_to((
-                r, r,
-                0.0, // x axis rotation of the ellipse
-                0,
-                1, // large flag arc, sweep flag
-                0.0,
-                self.height - r,
-            ))
-            .line_to((0.0, self.tab_position + 1.0 * r + self.tab_height)) //Line to tab start.
-            .elliptical_arc_to(( // first arc towards tab.
-                r, r,
-                0.0, // x axis rotation of the ellipse
-                0,
-                0, // large flag arc, sweep flag
-                -r,
+            ;
+
+        if (self.tab_position + 1.0 * r + self.tab_height) < self.height {
+            data = data
+                .elliptical_arc_to((
+                    r,
+                    r,
+                    0.0, // x axis rotation of the ellipse
+                    0,
+                    1, // large flag arc, sweep flag
+                    0.0,
+                    self.height - r,
+                ))
+                .line_to((0.0, self.tab_position + 1.0 * r + self.tab_height))
+                .elliptical_arc_to((
+                    // first arc towards tab.
+                    r,
+                    r,
+                    0.0, // x axis rotation of the ellipse
+                    0,
+                    0, // large flag arc, sweep flag
+                    -r,
+                    self.tab_position + 0.0 * r + self.tab_height,
+                ));
+        }
+
+        data = data
+            .line_to((
+                -self.tab_width + r,
                 self.tab_position + 0.0 * r + self.tab_height,
             ))
-            .line_to((-self.tab_width + r, self.tab_position + 0.0 * r + self.tab_height))
             .elliptical_arc_to((
-                r, r,
+                r,
+                r,
                 0.0, // x axis rotation of the ellipse
                 0,
                 1, // large flag arc, sweep flag
@@ -131,33 +145,36 @@ impl Tab {
             ))
             .line_to((-self.tab_width, self.tab_position + 1.0 * r))
             .elliptical_arc_to((
-                r, r,
+                r,
+                r,
                 0.0, // x axis rotation of the ellipse
                 0,
                 1, // large flag arc, sweep flag
                 -self.tab_width + r,
                 self.tab_position,
             ))
-            .line_to((-r, self.tab_position))
-            .elliptical_arc_to((
-                r, r,
-                0.0, // x axis rotation of the ellipse
-                0,
-                0, // large flag arc, sweep flag
-                0.0,
-                self.tab_position - r,
-            ))
-            .line_to((0.0, r)) //Line to tab start.
-            .elliptical_arc_to((
-                r, r,
-                0.0, // x axis rotation of the ellipse
-                0,
-                1, // large flag arc, sweep flag
-                r,
-                0.0,
-            ))
-            // .close();
-            ;
+            .line_to((-r, self.tab_position));
+
+        // Prevent the uglyness if the tab position is at the lower edge (0.0).
+        if self.tab_position > r {
+            data = data
+                .elliptical_arc_to((
+                    r,
+                    r,
+                    0.0, // x axis rotation of the ellipse
+                    0,
+                    0, // large flag arc, sweep flag
+                    0.0,
+                    (self.tab_position - r).max(0.0),
+                ))
+                .line_to((0.0, r)) //Line to tab start.
+                .elliptical_arc_to((
+                    r, r, 0.0, // x axis rotation of the ellipse
+                    0, 1, // large flag arc, sweep flag
+                    r, 0.0,
+                ));
+        };
+        data = data.close();
 
         let path = Path::new().set("d", data);
         path
