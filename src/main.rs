@@ -1,6 +1,8 @@
 use std::f64::consts::PI;
 use svg::Document;
 use svg_util::pie_chart::{PieChart, StartStyle};
+use svg_util::tab::{Tab, TabEdge};
+use svg_util::transform::Transformed;
 
 fn piechart_canvas() -> Document {
     use svg::node::element::path::Data;
@@ -59,7 +61,40 @@ fn make_piechart_align_largest() {
     svg::save("/tmp/test_pie_chart_align_largest.svg", &document).expect("failed to write svg");
 }
 
+fn make_tab() {
+    // let mut tab = Tab::new();
+
+    let document = piechart_canvas();
+
+    // Canvas is [-200,200] x [-200, 200]
+    let document = document.add(
+        Tab::new()
+            .sized(50.0, 80.0)
+            .radius(5.0)
+            .tab(15.0, 25.0)
+            .tab_position(15.0)
+            .tab_edge(TabEdge::Left)
+            .svg()
+            .set("stroke", "white"),
+    );
+
+    let document = document.add(
+        Tab::new()
+            .sized(50.0, 80.0)
+            .radius(5.0)
+            .tab(15.0, 25.0)
+            .tab_position(15.0)
+            .tab_edge(TabEdge::Right)
+            .svg()
+            .set("stroke", "white")
+            .translated_xy(60.0, 0.0),
+    );
+
+    svg::save("/tmp/test_tab.svg", &document).expect("failed to write svg");
+}
+
 fn main() {
     make_piechart();
     make_piechart_align_largest();
+    make_tab();
 }
