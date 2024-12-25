@@ -111,44 +111,44 @@ impl Tab {
                 0.0,
                 self.height - r,
             ))
-            .line_to((0.0, self.tab_position + 3.0 * r + self.tab_height)) //Line to tab start.
+            .line_to((0.0, self.tab_position + 1.0 * r + self.tab_height)) //Line to tab start.
             .elliptical_arc_to(( // first arc towards tab.
                 r, r,
                 0.0, // x axis rotation of the ellipse
                 0,
                 0, // large flag arc, sweep flag
                 -r,
-                self.tab_position + 2.0 * r + self.tab_height,
+                self.tab_position + 0.0 * r + self.tab_height,
             ))
-            .line_to((-self.tab_width + r, self.tab_position + 2.0 * r + self.tab_height)) //Line to tab start.
-            .elliptical_arc_to(( // first arc towards tab.
+            .line_to((-self.tab_width + r, self.tab_position + 0.0 * r + self.tab_height))
+            .elliptical_arc_to((
                 r, r,
                 0.0, // x axis rotation of the ellipse
                 0,
                 1, // large flag arc, sweep flag
                 -self.tab_width,
-                self.tab_position + 1.0 * r + self.tab_height,
+                self.tab_position - 1.0 * r + self.tab_height,
             ))
-            .line_to((-self.tab_width, self.tab_position + 2.0 * r)) //Line to tab start.
-            .elliptical_arc_to(( // first arc towards tab.
+            .line_to((-self.tab_width, self.tab_position + 1.0 * r))
+            .elliptical_arc_to((
                 r, r,
                 0.0, // x axis rotation of the ellipse
                 0,
                 1, // large flag arc, sweep flag
                 -self.tab_width + r,
-                self.tab_position + 1.0 * r,
+                self.tab_position,
             ))
-            .line_to((-r, self.tab_position + 1.0 * r)) //Line to tab start.
-            .elliptical_arc_to(( // first arc towards tab.
+            .line_to((-r, self.tab_position))
+            .elliptical_arc_to((
                 r, r,
                 0.0, // x axis rotation of the ellipse
                 0,
                 0, // large flag arc, sweep flag
                 0.0,
-                self.tab_position,
+                self.tab_position - r,
             ))
             .line_to((0.0, r)) //Line to tab start.
-            .elliptical_arc_to(( // first arc towards tab.
+            .elliptical_arc_to((
                 r, r,
                 0.0, // x axis rotation of the ellipse
                 0,

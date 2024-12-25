@@ -70,12 +70,13 @@ fn make_tab() {
     let document = document.add(
         Tab::new()
             .sized(50.0, 80.0)
-            .radius(5.0)
+            .radius(10.0)
             .tab(15.0, 25.0)
             .tab_position(15.0)
             .tab_edge(TabEdge::Left)
             .svg()
-            .set("stroke", "white"),
+            .set("stroke", "red")
+            .set("fill", "none"),
     );
 
     let document = document.add(
@@ -86,7 +87,19 @@ fn make_tab() {
             .tab_position(15.0)
             .tab_edge(TabEdge::Right)
             .svg()
+            .set("stroke", "green")
+            .set("fill", "none"),
+    );
+    let document = document.add(
+        Tab::new()
+            .sized(50.0, 80.0)
+            .radius(5.0)
+            .tab(15.0, 25.0)
+            .tab_position(15.0)
+            .tab_edge(TabEdge::Right)
+            .svg()
             .set("stroke", "white")
+            .set("fill", "none")
             .translated_xy(60.0, 0.0),
     );
 
