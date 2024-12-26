@@ -27,7 +27,7 @@ https://yqnn.github.io/svg-path-editor/#P=M_25_0_L_260_0_A_20_20_0_0_1_280_20_V_
                  tab width
 */
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, Debug, PartialEq, PartialOrd, Eq)]
 pub enum TabEdge {
     #[default]
     Left,
@@ -36,7 +36,7 @@ pub enum TabEdge {
     Bottom,
 }
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, Debug, PartialEq, PartialOrd)]
 pub struct Tab {
     pub radius: f64,
     pub width: f64,
