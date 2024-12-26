@@ -154,3 +154,9 @@ impl PieChart {
         group
     }
 }
+
+impl From<PieChart> for Box<(dyn svg::Node + 'static)> {
+    fn from(val: PieChart) -> Self {
+        Box::new(val.svg())
+    }
+}

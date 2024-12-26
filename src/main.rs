@@ -39,7 +39,7 @@ fn make_piechart() {
     pie_chart.set_segments(&[0.15, 0.3, 0.4, 0.15]);
 
     let document = piechart_canvas();
-    let document = document.add(pie_chart.svg());
+    let document = document.add(pie_chart);
 
     svg::save("/tmp/test_pie_chart.svg", &document).expect("failed to write svg");
 }
