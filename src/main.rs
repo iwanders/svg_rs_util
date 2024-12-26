@@ -215,6 +215,18 @@ fn make_tab() {
             .set("fill", "none")
             .translated_xy(0.0, 110.0),
     );
+    let document = document.add(
+        Tab::new()
+            .sized(50.0, 80.0)
+            .radius(5.0)
+            .tab(10.0, 20.0)
+            .tab_position(40.0)
+            .tab_edge(TabEdge::Top)
+            .svg()
+            .set("stroke", "yellow")
+            .set("fill", "none")
+            .translated_xy(0.0, 110.0),
+    );
 
     svg::save("/tmp/test_tab.svg", &document).expect("failed to write svg");
 }

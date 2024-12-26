@@ -121,6 +121,8 @@ impl Tab {
             n: (f64, f64),
             o: (f64, f64),
             p: (f64, f64),
+            tab_not_near_end: bool,
+            tab_not_near_start: bool,
         }
         let d = match self.tab_edge {
             TabEdge::Left => TabData {
@@ -146,6 +148,8 @@ impl Tab {
                 n: (-r, self.tab_position),
                 o: (0.0, self.tab_position - r),
                 p: ((0.0, r)),
+                tab_not_near_end: (self.tab_position + 1.0 * r + self.tab_height) < self.height,
+                tab_not_near_start: self.tab_position > r,
                 ..Default::default()
             },
             TabEdge::Top => {
@@ -169,6 +173,8 @@ impl Tab {
                     n: (self.tab_position + self.tab_width, -r),
                     o: (self.tab_position + self.tab_width + r, 0.0),
                     p: (self.width - r, 0.0),
+                    tab_not_near_end: (self.tab_position - r) > 0.0,
+                    tab_not_near_start: (self.tab_position + 1.0 * r + self.tab_width) < self.width,
                     ..Default::default()
                 }
             }
@@ -197,7 +203,7 @@ impl Tab {
             .line_to(d.f) // straight line to third curve
             ;
 
-        if (self.tab_position + 1.0 * r + self.tab_height) < self.height {
+        if d.tab_not_near_end {
             data = data
                 .elliptical_arc_to((
                     r, r, 0.0, // x axis rotation of the ellipse
@@ -229,7 +235,7 @@ impl Tab {
             .line_to(d.n);
 
         // Prevent the uglyness if the tab position is at the lower edge (0.0).
-        if self.tab_position > r {
+        if d.tab_not_near_start {
             data = data
                 .elliptical_arc_to((
                     r, r, 0.0, // x axis rotation of the ellipse
