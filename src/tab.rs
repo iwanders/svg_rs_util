@@ -77,101 +77,146 @@ impl Tab {
 
     pub fn svg(&self) -> Path {
         let r = self.radius;
-        // let h_straight = self.height - r * 2.0;
-        // let w_straight = self.width - r * 2.0;
-        // let tab_h_straight = self.tab_height - r * 2.0;
-        // let tab_w_straight = self.tab_width - r * 2.0;
 
-        // M 25 0 L 260 0 A 20 20 0 0 1 280 20 V 160 A 20 20 0 0 1 260 180 L 20 180 A 20 20 0 0 1 0 160 L 0 140 A 20 20 0 0 0 -20 120 L -50 120 A 20 20 0 0 1 -70 100 L -70 80 A 20 20 0 0 1 -50 60 L -20 60 A 20 20 0 0 0 0 40 L 0 20 A 20 20 0 0 1 20 0 Z
+        /*
+
+
+                     O-A------------B--+
+                     P                 |
+                     |                 |
+                     O                 C
+               ^ +M-N+                 |
+         tab   : L                     |
+         height: |                     |
+               : |                     |
+               : |                     |
+               : K                     |
+               : |                     |
+               v +-J-I-+               |
+                       |               |
+                       H               |
+                       |               |
+                       G               D
+                       |               |
+                       +--F---------E--+
+
+                 tab width
+        */
+
+        #[derive(Default)]
+        struct TabData {
+            a: (f64, f64),
+            b: (f64, f64),
+            c: (f64, f64),
+            d: (f64, f64),
+            e: (f64, f64),
+            f: (f64, f64),
+            g: (f64, f64),
+            h: (f64, f64),
+            i: (f64, f64),
+            j: (f64, f64),
+            k: (f64, f64),
+            l: (f64, f64),
+            m: (f64, f64),
+            n: (f64, f64),
+            o: (f64, f64),
+            p: (f64, f64),
+        }
+        let d = match self.tab_edge {
+            TabEdge::Left => TabData {
+                a: (r, 0.0),
+                b: (self.width - r, 0.0),
+                c: (self.width, r),
+                d: (self.width, self.height - r),
+                e: (self.width - r, self.height),
+                f: (r, self.height),
+                g: (0.0, self.height - r),
+                h: (0.0, self.tab_position + 1.0 * r + self.tab_height),
+                i: (-r, self.tab_position + 0.0 * r + self.tab_height),
+                j: (
+                    -self.tab_width + r,
+                    self.tab_position + 0.0 * r + self.tab_height,
+                ),
+                k: (
+                    -self.tab_width,
+                    self.tab_position - 1.0 * r + self.tab_height,
+                ),
+                l: (-self.tab_width, self.tab_position + 1.0 * r),
+                m: (-self.tab_width + r, self.tab_position),
+                n: (-r, self.tab_position),
+                o: (0.0, self.tab_position - r),
+                p: ((0.0, r)),
+                ..Default::default()
+            },
+            _ => todo!(),
+        };
+
         let mut data = Data::new()
-            .move_to((r, 0.0)) // start at radius offset
-            .line_to((self.width -  r, 0.0)) // straight line at top to first curve.
+            .move_to(d.a) // start at radius offset
+            .line_to(d.b) // straight line at top to first curve.
             .elliptical_arc_to((
                 r, r,
                 0.0, // x axis rotation of the ellipse
                 0, 1, // large flag arc, sweep flag
-                self.width,
-                r,
+                d.c.0,
+                d.c.1,
             ))
-            .line_to((self.width, self.height - r)) // straight line to second curve
+            .line_to(d.d) // straight line to second curve
             .elliptical_arc_to((
                 r, r,
                 0.0, // x axis rotation of the ellipse
                 0,
                 1, // large flag arc, sweep flag
-                self.width - r,
-                self.height,
+                d.e.0,
+                d.e.1,
             ))
-            .line_to((r, self.height)) // straight line to third curve
+            .line_to(d.f) // straight line to third curve
             ;
 
         if (self.tab_position + 1.0 * r + self.tab_height) < self.height {
             data = data
                 .elliptical_arc_to((
-                    r,
-                    r,
-                    0.0, // x axis rotation of the ellipse
-                    0,
-                    1, // large flag arc, sweep flag
-                    0.0,
-                    self.height - r,
+                    r, r, 0.0, // x axis rotation of the ellipse
+                    0, 1, // large flag arc, sweep flag
+                    d.g.0, d.g.1,
                 ))
-                .line_to((0.0, self.tab_position + 1.0 * r + self.tab_height))
+                .line_to(d.h)
                 .elliptical_arc_to((
                     // first arc towards tab.
-                    r,
-                    r,
-                    0.0, // x axis rotation of the ellipse
-                    0,
-                    0, // large flag arc, sweep flag
-                    -r,
-                    self.tab_position + 0.0 * r + self.tab_height,
+                    r, r, 0.0, // x axis rotation of the ellipse
+                    0, 0, // large flag arc, sweep flag
+                    d.i.0, d.i.1,
                 ));
         }
 
         data = data
-            .line_to((
-                -self.tab_width + r,
-                self.tab_position + 0.0 * r + self.tab_height,
-            ))
+            .line_to(d.j)
             .elliptical_arc_to((
-                r,
-                r,
-                0.0, // x axis rotation of the ellipse
-                0,
-                1, // large flag arc, sweep flag
-                -self.tab_width,
-                self.tab_position - 1.0 * r + self.tab_height,
+                r, r, 0.0, // x axis rotation of the ellipse
+                0, 1, // large flag arc, sweep flag
+                d.k.0, d.k.1,
             ))
-            .line_to((-self.tab_width, self.tab_position + 1.0 * r))
+            .line_to(d.l)
             .elliptical_arc_to((
-                r,
-                r,
-                0.0, // x axis rotation of the ellipse
-                0,
-                1, // large flag arc, sweep flag
-                -self.tab_width + r,
-                self.tab_position,
+                r, r, 0.0, // x axis rotation of the ellipse
+                0, 1, // large flag arc, sweep flag
+                d.m.0, d.m.1,
             ))
-            .line_to((-r, self.tab_position));
+            .line_to(d.n);
 
         // Prevent the uglyness if the tab position is at the lower edge (0.0).
         if self.tab_position > r {
             data = data
                 .elliptical_arc_to((
-                    r,
-                    r,
-                    0.0, // x axis rotation of the ellipse
-                    0,
-                    0, // large flag arc, sweep flag
-                    0.0,
-                    (self.tab_position - r).max(0.0),
+                    r, r, 0.0, // x axis rotation of the ellipse
+                    0, 0, // large flag arc, sweep flag
+                    d.o.0, d.o.1,
                 ))
-                .line_to((0.0, r)) //Line to tab start.
+                .line_to(d.p) //Line to tab start.
                 .elliptical_arc_to((
                     r, r, 0.0, // x axis rotation of the ellipse
                     0, 1, // large flag arc, sweep flag
-                    r, 0.0,
+                    d.a.0, d.a.1,
                 ));
         };
         data = data.close();
