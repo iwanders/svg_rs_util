@@ -38,13 +38,13 @@ pub enum TabEdge {
 
 #[derive(Clone, Copy, Default)]
 pub struct Tab {
-    radius: f64,
-    width: f64,
-    height: f64,
-    tab_edge: TabEdge,
-    tab_width: f64,
-    tab_height: f64,
-    tab_position: f64,
+    pub radius: f64,
+    pub width: f64,
+    pub height: f64,
+    pub tab_edge: TabEdge,
+    pub tab_width: f64,
+    pub tab_height: f64,
+    pub tab_position: f64,
 }
 
 impl Tab {
@@ -253,5 +253,11 @@ impl Tab {
 
         let path = Path::new().set("d", data);
         path
+    }
+}
+
+impl Into<Box<(dyn svg::Node + 'static)>> for Tab {
+    fn into(self) -> Box<(dyn svg::Node + 'static)> {
+        Box::new(self.svg())
     }
 }

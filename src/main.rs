@@ -1,4 +1,5 @@
 use std::f64::consts::PI;
+use svg::node::element::Group;
 use svg::Document;
 use svg_util::pie_chart::{PieChart, StartStyle};
 use svg_util::tab::{Tab, TabEdge};
@@ -226,6 +227,18 @@ fn make_tab() {
             .set("stroke", "yellow")
             .set("fill", "none")
             .translated_xy(0.0, 110.0),
+    );
+    let document = document.add(
+        Group::new()
+            .add(
+                Tab::new()
+                    .sized(50.0, 80.0)
+                    .radius(5.0)
+                    .tab(10.0, 20.0)
+                    .tab_position(40.0)
+                    .tab_edge(TabEdge::Top),
+            )
+            .translated_xy(80.0, 110.0),
     );
 
     svg::save("/tmp/test_tab.svg", &document).expect("failed to write svg");
