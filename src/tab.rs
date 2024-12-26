@@ -125,33 +125,35 @@ impl Tab {
             tab_not_near_start: bool,
         }
         let d = match self.tab_edge {
-            TabEdge::Left => TabData {
-                a: (r, 0.0),
-                b: (self.width - r, 0.0),
-                c: (self.width, r),
-                d: (self.width, self.height - r),
-                e: (self.width - r, self.height),
-                f: (r, self.height),
-                g: (0.0, self.height - r),
-                h: (0.0, self.tab_position + 1.0 * r + self.tab_height),
-                i: (-r, self.tab_position + 0.0 * r + self.tab_height),
-                j: (
-                    -self.tab_width + r,
-                    self.tab_position + 0.0 * r + self.tab_height,
-                ),
-                k: (
-                    -self.tab_width,
-                    self.tab_position - 1.0 * r + self.tab_height,
-                ),
-                l: (-self.tab_width, self.tab_position + 1.0 * r),
-                m: (-self.tab_width + r, self.tab_position),
-                n: (-r, self.tab_position),
-                o: (0.0, self.tab_position - r),
-                p: ((0.0, r)),
-                tab_not_near_end: (self.tab_position + 1.0 * r + self.tab_height) < self.height,
-                tab_not_near_start: self.tab_position > r,
-                ..Default::default()
-            },
+            TabEdge::Left => {
+                TabData {
+                    a: (r, 0.0),
+                    b: (self.width - r, 0.0),
+                    c: (self.width, r),
+                    d: (self.width, self.height - r),
+                    e: (self.width - r, self.height),
+                    f: (r, self.height),
+                    g: (0.0, self.height - r),
+                    h: (0.0, self.tab_position + 1.0 * r + self.tab_height),
+                    i: (-r, self.tab_position + 0.0 * r + self.tab_height),
+                    j: (
+                        -self.tab_width + r,
+                        self.tab_position + 0.0 * r + self.tab_height,
+                    ),
+                    k: (
+                        -self.tab_width,
+                        self.tab_position - 1.0 * r + self.tab_height,
+                    ),
+                    l: (-self.tab_width, self.tab_position + 1.0 * r),
+                    m: (-self.tab_width + r, self.tab_position),
+                    n: (-r, self.tab_position),
+                    o: (0.0, self.tab_position - r),
+                    p: (0.0, r),
+                    tab_not_near_end: (self.tab_position + 1.0 * r + self.tab_height) < self.height,
+                    tab_not_near_start: self.tab_position > r,
+                    // ..Default::default()
+                }
+            }
             TabEdge::Top => {
                 // Previously, we had the tab on the left, and start with the top.
                 // Now the tab is on the top, so we start with the right.
@@ -175,7 +177,7 @@ impl Tab {
                     p: (self.width - r, 0.0),
                     tab_not_near_end: (self.tab_position - r) > 0.0,
                     tab_not_near_start: (self.tab_position + 1.0 * r + self.tab_width) < self.width,
-                    ..Default::default()
+                    // ..Default::default()
                 }
             }
             _ => todo!(),
@@ -251,13 +253,12 @@ impl Tab {
         };
         data = data.close();
 
-        let path = Path::new().set("d", data);
-        path
+        Path::new().set("d", data)
     }
 }
 
-impl Into<Box<(dyn svg::Node + 'static)>> for Tab {
-    fn into(self) -> Box<(dyn svg::Node + 'static)> {
-        Box::new(self.svg())
+impl From<Tab> for Box<(dyn svg::Node + 'static)> {
+    fn from(val: Tab) -> Self {
+        Box::new(val.svg())
     }
 }

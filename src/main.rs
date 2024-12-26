@@ -18,12 +18,11 @@ fn piechart_canvas() -> Document {
 
     let path = Path::new().set("fill", "black").set("d", data);
 
-    let document = Document::new()
+    Document::new()
         .set("viewBox", (-200, -200, 400, 400)) // from -200,-200, width and height of 400.
         .set("width", "2000px")
         .set("height", "2000px")
-        .add(path);
-    document
+        .add(path)
 }
 
 fn make_piechart() {
