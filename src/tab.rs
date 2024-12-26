@@ -34,6 +34,7 @@ pub enum TabEdge {
     Right,
     Top,
     Bottom,
+    None,
 }
 
 #[derive(Clone, Copy, Default, Debug, PartialEq, PartialOrd)]
@@ -123,7 +124,11 @@ impl Tab {
             p: (f64, f64),
             tab_not_near_end: bool,
             tab_not_near_start: bool,
+            has_tab: bool,
         }
+        let has_tab = !matches!(self.tab_edge, TabEdge::None)
+            && (self.tab_width != 0.0 && self.tab_height != 0.0);
+
         let d = match self.tab_edge {
             TabEdge::Left => {
                 TabData {
@@ -151,6 +156,7 @@ impl Tab {
                     p: (0.0, r),
                     tab_not_near_end: (self.tab_position + 1.0 * r + self.tab_height) < self.height,
                     tab_not_near_start: self.tab_position > r,
+                    has_tab: has_tab,
                     // ..Default::default()
                 }
             }
@@ -177,8 +183,17 @@ impl Tab {
                     p: (self.width - r, 0.0),
                     tab_not_near_end: (self.tab_position - r) > 0.0,
                     tab_not_near_start: (self.tab_position + 1.0 * r + self.tab_width) < self.width,
+                    has_tab: has_tab,
                     // ..Default::default()
                 }
+            }
+            TabEdge::None => {
+                // Super gross, but hey it works.
+                let mut c = self.clone();
+                c.tab_width = 0.0;
+                c.tab_height = 0.0;
+                c.tab_edge = TabEdge::Left;
+                return c.svg();
             }
             _ => todo!(),
         };
@@ -205,52 +220,68 @@ impl Tab {
             .line_to(d.f) // straight line to third curve
             ;
 
-        if d.tab_not_near_end {
+        if d.has_tab {
+            if d.tab_not_near_end {
+                data = data
+                    .elliptical_arc_to((
+                        r, r, 0.0, // x axis rotation of the ellipse
+                        0, 1, // large flag arc, sweep flag
+                        d.g.0, d.g.1,
+                    ))
+                    .line_to(d.h)
+                    .elliptical_arc_to((
+                        // first arc towards tab.
+                        r, r, 0.0, // x axis rotation of the ellipse
+                        0, 0, // large flag arc, sweep flag
+                        d.i.0, d.i.1,
+                    ));
+            }
+
+            data = data
+                .line_to(d.j)
+                .elliptical_arc_to((
+                    r, r, 0.0, // x axis rotation of the ellipse
+                    0, 1, // large flag arc, sweep flag
+                    d.k.0, d.k.1,
+                ))
+                .line_to(d.l)
+                .elliptical_arc_to((
+                    r, r, 0.0, // x axis rotation of the ellipse
+                    0, 1, // large flag arc, sweep flag
+                    d.m.0, d.m.1,
+                ))
+                .line_to(d.n);
+
+            // Prevent the uglyness if the tab position is at the lower edge (0.0).
+            if d.tab_not_near_start {
+                data = data
+                    .elliptical_arc_to((
+                        r, r, 0.0, // x axis rotation of the ellipse
+                        0, 0, // large flag arc, sweep flag
+                        d.o.0, d.o.1,
+                    ))
+                    .line_to(d.p) //Line to tab start.
+                    .elliptical_arc_to((
+                        r, r, 0.0, // x axis rotation of the ellipse
+                        0, 1, // large flag arc, sweep flag
+                        d.a.0, d.a.1,
+                    ));
+            };
+        } else {
             data = data
                 .elliptical_arc_to((
                     r, r, 0.0, // x axis rotation of the ellipse
                     0, 1, // large flag arc, sweep flag
                     d.g.0, d.g.1,
                 ))
-                .line_to(d.h)
-                .elliptical_arc_to((
-                    // first arc towards tab.
-                    r, r, 0.0, // x axis rotation of the ellipse
-                    0, 0, // large flag arc, sweep flag
-                    d.i.0, d.i.1,
-                ));
-        }
-
-        data = data
-            .line_to(d.j)
-            .elliptical_arc_to((
-                r, r, 0.0, // x axis rotation of the ellipse
-                0, 1, // large flag arc, sweep flag
-                d.k.0, d.k.1,
-            ))
-            .line_to(d.l)
-            .elliptical_arc_to((
-                r, r, 0.0, // x axis rotation of the ellipse
-                0, 1, // large flag arc, sweep flag
-                d.m.0, d.m.1,
-            ))
-            .line_to(d.n);
-
-        // Prevent the uglyness if the tab position is at the lower edge (0.0).
-        if d.tab_not_near_start {
-            data = data
-                .elliptical_arc_to((
-                    r, r, 0.0, // x axis rotation of the ellipse
-                    0, 0, // large flag arc, sweep flag
-                    d.o.0, d.o.1,
-                ))
-                .line_to(d.p) //Line to tab start.
+                .line_to(d.p)
                 .elliptical_arc_to((
                     r, r, 0.0, // x axis rotation of the ellipse
                     0, 1, // large flag arc, sweep flag
                     d.a.0, d.a.1,
                 ));
-        };
+        }
+
         data = data.close();
 
         Path::new().set("d", data)
