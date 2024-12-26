@@ -148,6 +148,30 @@ impl Tab {
                 p: ((0.0, r)),
                 ..Default::default()
             },
+            TabEdge::Top => {
+                // Previously, we had the tab on the left, and start with the top.
+                // Now the tab is on the top, so we start with the right.
+                // rotate all points?
+                TabData {
+                    a: (self.width, r),
+                    b: (self.width, self.height - r),
+                    c: (self.width - r, self.height),
+                    d: (r, self.height),
+                    e: (0.0, self.height - r), // bottom left corner done.
+                    f: (0.0, r),               // to start of top left corner.
+                    g: (r, 0.0),
+                    h: (self.tab_position - 1.0 * r, 0.0),
+                    i: (self.tab_position, -r),
+                    j: (self.tab_position, -self.tab_height + r),
+                    k: (self.tab_position + r, -self.tab_height), // arc to
+                    l: (self.tab_position + self.tab_width - r, -self.tab_height), // tab straight.
+                    m: (self.tab_position + self.tab_width, -self.tab_height + r),
+                    n: (self.tab_position + self.tab_width, -r),
+                    o: (self.tab_position + self.tab_width + r, 0.0),
+                    p: (self.width - r, 0.0),
+                    ..Default::default()
+                }
+            }
             _ => todo!(),
         };
 
