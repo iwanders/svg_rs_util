@@ -187,6 +187,37 @@ impl Tab {
                     // ..Default::default()
                 }
             }
+            TabEdge::Right => {
+                TabData {
+                    a: (self.width - r, self.height), // start of bottom edge.
+                    b: (r, self.height),              // bottom left arc start
+                    c: (0.0, self.height - r),        // bottom left arc end
+                    d: (0.0, r),                      // top left arc start
+                    e: (r, 0.0),                      // top left arc end
+                    f: (self.width - r, 0.0),
+                    g: (self.width, r),
+                    h: (self.width, self.tab_position - r),
+                    i: (self.width + r, self.tab_position),
+                    j: (self.width + self.tab_width - r, self.tab_position),
+                    k: (self.width + self.tab_width, self.tab_position + r),
+                    l: (
+                        self.width + self.tab_width,
+                        self.tab_position + self.tab_height - r,
+                    ),
+                    m: (
+                        self.width + self.tab_width - r,
+                        self.tab_position + self.tab_height,
+                    ),
+                    n: (self.width + r, self.tab_position + self.tab_height), // straight to last arc.
+                    o: (self.width, self.tab_position + self.tab_height + r),
+                    p: (self.width, self.height - r),
+                    tab_not_near_end: self.tab_position > r,
+                    tab_not_near_start: (self.tab_position + 1.0 * r + self.tab_height)
+                        < self.height,
+                    has_tab: has_tab,
+                    // ..Default::default()
+                }
+            }
             TabEdge::None => {
                 // Super gross, but hey it works.
                 let mut c = self.clone();

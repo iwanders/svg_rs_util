@@ -139,14 +139,13 @@ fn make_tab() {
             .translated_xy(-80.0, 0.0),
     );
 
-    // This breaks, it cannot do zero sized tabs.
     let document = document.add(
         Tab::new()
             .sized(50.0, 80.0)
             .radius(5.0)
-            .tab(0.0, 0.0)
-            .tab_position(0.0)
-            .tab_edge(TabEdge::Left)
+            .tab(25.0, 10.0)
+            .tab_position(30.0)
+            .tab_edge(TabEdge::Right)
             .svg()
             .set("stroke", "orange")
             .set("fill", "none")
