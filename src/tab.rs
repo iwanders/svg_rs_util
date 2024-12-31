@@ -218,6 +218,35 @@ impl Tab {
                     // ..Default::default()
                 }
             }
+            TabEdge::Bottom => {
+                TabData {
+                    a: (0.0, self.height - r), // bottom left arc end
+                    b: (0.0, r),               // top left arc start
+                    c: (r, 0.0),               // top left arc end
+                    d: (self.width - r, 0.0),
+                    e: (self.width, r),
+                    f: (self.width, self.height - r),
+                    g: (self.width - r, self.height),
+                    h: (self.tab_position + self.tab_width + 1.0 * r, self.height),
+                    i: (self.tab_position + self.tab_width, self.height + r),
+                    j: (
+                        self.tab_position + self.tab_width,
+                        self.height + self.tab_height - r,
+                    ),
+                    k: (
+                        self.tab_position + self.tab_width - r,
+                        self.height + self.tab_height,
+                    ), // arc to
+                    l: (self.tab_position + r, self.height + self.tab_height), // tab straight.
+                    m: (self.tab_position, self.height + self.tab_height - r),
+                    n: (self.tab_position, self.height + r),
+                    o: (self.tab_position - r, self.height), // start of bottom edge.
+                    p: (r, self.height),                     // bottom left arc start
+                    tab_not_near_end: (self.tab_position + 1.0 * r + self.tab_width) < self.width,
+                    tab_not_near_start: self.tab_position > r,
+                    has_tab: has_tab,
+                }
+            }
             TabEdge::None => {
                 // Super gross, but hey it works.
                 let mut c = self.clone();
@@ -226,7 +255,6 @@ impl Tab {
                 c.tab_edge = TabEdge::Left;
                 return c.svg();
             }
-            _ => todo!(),
         };
 
         let mut data = Data::new()
