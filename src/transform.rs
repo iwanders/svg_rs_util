@@ -49,6 +49,16 @@ pub trait Transformed: svg::Node {
         z.translate_xy(x, y);
         z
     }
+
+    /// A rotated transform
+    fn rotated<T: Into<svg::node::Value>>(self, x: T) -> Self
+    where
+        Self: Sized,
+    {
+        let mut z = self;
+        z.assign("transform", format!("rotate({})", x.into()));
+        z
+    }
 }
 
 // Blanket implementation for all nodes, since transform is applicable to anything.
