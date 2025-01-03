@@ -27,6 +27,7 @@ https://yqnn.github.io/svg-path-editor/#P=M_25_0_L_260_0_A_20_20_0_0_1_280_20_V_
                  tab width
 */
 
+/// Denotes on which edge the tab protrusion is located.
 #[derive(Clone, Copy, Default, Debug, PartialEq, PartialOrd, Eq)]
 pub enum TabEdge {
     #[default]
@@ -37,45 +38,60 @@ pub enum TabEdge {
     None,
 }
 
+/// The tab's properties.
 #[derive(Clone, Copy, Default, Debug, PartialEq, PartialOrd)]
 pub struct Tab {
+    /// The rounding radius.
     pub radius: f64,
+    /// The width of the tab (without protrusion).
     pub width: f64,
+    /// The height of the tab (without protrusion).
     pub height: f64,
+    /// The edge on which the tab is located.
     pub tab_edge: TabEdge,
+    /// The width of the tab protrusion.
     pub tab_width: f64,
+    /// The height of the tab protrusion.
     pub tab_height: f64,
+    /// The position of the tab itself, offset from the start of the edge on which it is located.
     pub tab_position: f64,
 }
 
 impl Tab {
+    /// Create a new tab shape.
     pub fn new() -> Self {
         Default::default()
     }
+    /// Returns a tab with the width and height set to the provided values.
     pub fn sized(mut self, width: f64, height: f64) -> Self {
         self.width = width;
         self.height = height;
         self
     }
+    /// Returns a tab with the radius set to the provided value.
     pub fn radius(mut self, radius: f64) -> Self {
         self.radius = radius;
         self
     }
+    /// Returns a tab with the tab's width and height set to the provided values.
     pub fn tab(mut self, tab_width: f64, tab_height: f64) -> Self {
         self.tab_width = tab_width;
         self.tab_height = tab_height;
         self
     }
+    /// Returns a tab with the tab's edge set to the specified value.
     pub fn tab_edge(mut self, tab_edge: TabEdge) -> Self {
         self.tab_edge = tab_edge;
         self
     }
 
+    /// Returns a tab with the tab positioned at this offset along the tab's edge.
     pub fn tab_position(mut self, tab_position: f64) -> Self {
         self.tab_position = tab_position;
         self
     }
 
+    /// Returns the svg path that creates the tab shape.
     pub fn svg(&self) -> Path {
         let r = self.radius;
 
