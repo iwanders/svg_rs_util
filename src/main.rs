@@ -286,7 +286,8 @@ fn make_tab() {
             .svg()
             .set("stroke", "yellow")
             .set("fill", "none")
-            .translated_xy(-80.0, 110.0),
+            .translated_xy(-80.0, 110.0)
+            .rotated(45),
     );
 
     svg::save("/tmp/test_tab.svg", &document).expect("failed to write svg");

@@ -50,13 +50,21 @@ pub trait Transformed: svg::Node {
         z
     }
 
+    /// Rotate this element by x degrees.
+    fn rotate<T: Into<svg::node::Value>>(&mut self, x: T)
+    where
+        Self: Sized,
+    {
+        self.assign("transform", format!("rotate({})", x.into()));
+    }
+
     /// A rotated transform, rotates by x degrees.
     fn rotated<T: Into<svg::node::Value>>(self, x: T) -> Self
     where
         Self: Sized,
     {
         let mut z = self;
-        z.assign("transform", format!("rotate({})", x.into()));
+        z.rotate(x);
         z
     }
 }
