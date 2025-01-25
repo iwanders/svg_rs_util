@@ -17,16 +17,19 @@ enum AxisOrientation {
 
 #[derive(Debug, Copy, Clone, Default)]
 pub struct Axis {
-    canvas_length: f64,
-    range: Range,
+    canvas_range: Range,
+    plot_range: Range,
     orientation: AxisOrientation,
 }
 
 impl Axis {
     fn horizontal(canvas_length: f64) -> Self {
         Self {
-            canvas_length,
-            range: Range {
+            canvas_range: Range {
+                min: 0.0,
+                max: canvas_length,
+            },
+            plot_range: Range {
                 min: 0.0,
                 max: canvas_length,
             },
@@ -37,8 +40,11 @@ impl Axis {
 
     fn vertical(canvas_length: f64) -> Self {
         Self {
-            canvas_length,
-            range: Range {
+            canvas_range: Range {
+                min: 0.0,
+                max: canvas_length,
+            },
+            plot_range: Range {
                 min: 0.0,
                 max: canvas_length,
             },
@@ -48,11 +54,10 @@ impl Axis {
     }
 
     fn project(&self, v: f64) -> f64 {
-        todo!("what semantics do we want here if range spans zero?");
-        let shifted = v - self.range.min;
-        let ratio = shifted / (self.range.max - self.range.min);
-        let canvas_pos = ratio * self.canvas_length;
-        canvas_pos
+        let shifted = v - self.plot_range.min;
+        let ratio = shifted / (self.plot_range.max - self.plot_range.min);
+        let canvas_pos = ratio * (self.canvas_range.max - self.canvas_range.min);
+        canvas_pos + self.canvas_range.min
     }
 
     fn svg(&self) -> Group {
@@ -61,9 +66,13 @@ impl Axis {
         group
     }
 
-    pub fn set_range(&mut self, min: f64, max: f64) {
-        self.range.min = min;
-        self.range.max = max;
+    pub fn set_plot_range(&mut self, min: f64, max: f64) {
+        self.plot_range.min = min;
+        self.plot_range.max = max;
+    }
+    pub fn set_canvas_range(&mut self, min: f64, max: f64) {
+        self.canvas_range.min = min;
+        self.canvas_range.max = max;
     }
 }
 
@@ -91,9 +100,9 @@ impl AxisHorizontal {
         z.project(v)
     }
 
-    pub fn set_range(&self, min: f64, max: f64) {
+    pub fn set_plot_range(&self, min: f64, max: f64) {
         let mut z = self.0.borrow_mut();
-        z.set_range(min, max)
+        z.set_plot_range(min, max)
     }
 }
 
@@ -114,9 +123,13 @@ impl AxisVertical {
         z.project(v)
     }
 
-    pub fn set_range(&self, min: f64, max: f64) {
+    pub fn set_plot_range(&self, min: f64, max: f64) {
         let mut z = self.0.borrow_mut();
-        z.set_range(min, max)
+        z.set_plot_range(min, max)
+    }
+    pub fn set_canvas_range(&self, min: f64, max: f64) {
+        let mut z = self.0.borrow_mut();
+        z.set_canvas_range(min, max)
     }
 }
 
