@@ -276,6 +276,8 @@ pub struct Plot {
 
 impl Plot {
     pub fn new(frame: &Frame) -> Self {
+        todo!("not ready for production yet");
+        // Needs coordinate frame flip.
         Self {
             frames: vec![frame.clone()],
             elements: vec![],

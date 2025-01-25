@@ -3,7 +3,6 @@ use svg::node::element::Group;
 use svg::Document;
 use svg::Node;
 use svg_util::pie_chart::{PieChart, StartStyle};
-use svg_util::plot;
 use svg_util::tab::{Tab, TabEdge};
 use svg_util::transform::Transformed;
 
@@ -296,8 +295,11 @@ fn make_tab() {
 }
 
 fn make_plot() {
+    use svg_util::plot;
+    /*
     use svg::node::element::path::Data;
     use svg::node::element::Path;
+
 
     let mut v = plot::AxisVertical::new(500.0);
     v.set_canvas_range(-100.0, 100.0);
@@ -314,8 +316,7 @@ fn make_plot() {
         let t = i as f64 / 100.0;
         data.push((t, t.sin()));
     }
-    let mut el = p
-        .line_xy(&data)
+    let mut el = p.line_xy(&data)
         .set("fill", "none")
         .set("stroke", "navy")
         .set("stroke-width", "5");
@@ -344,6 +345,7 @@ fn make_plot() {
         .add(group);
 
     svg::save("/tmp/test_plot.svg", &document).expect("failed to write svg");
+    */
 }
 
 fn main() {
