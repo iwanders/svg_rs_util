@@ -1,3 +1,4 @@
+use crate::transform::*;
 use std::rc::Rc;
 use svg::node::element::{Group, Polyline};
 use svg::node::{Attributes, Node, Value};
@@ -15,11 +16,12 @@ enum AxisOrientation {
     Vertical,
 }
 
-#[derive(Debug, Copy, Clone, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct Axis {
     canvas_range: Range,
     plot_range: Range,
     orientation: AxisOrientation,
+    attributes: Attributes,
 }
 
 impl Axis {
@@ -62,7 +64,26 @@ impl Axis {
 
     fn svg(&self) -> Group {
         let mut group = Group::new();
-
+        let mut points = String::new();
+        let coords = match self.orientation {
+            AxisOrientation::Horizontal => {
+                [(self.canvas_range.min, 0.0), (self.canvas_range.max, 0.0)]
+            }
+            AxisOrientation::Vertical => {
+                [(0.0, self.canvas_range.min), (0.0, self.canvas_range.max)]
+            }
+        };
+        for (x, y) in coords {
+            // let px = self.project(x);
+            // let py = self.project(y);
+            points += &format!("{},{} ", x, y);
+        }
+        let mut path = Polyline::new().set("points", points);
+        let attr = path.get_attributes_mut().unwrap();
+        for (k, v) in self.attributes.iter() {
+            attr.insert(k.clone(), v.clone());
+        }
+        group.append(path);
         group
     }
 
@@ -104,6 +125,26 @@ impl AxisHorizontal {
         let mut z = self.0.borrow_mut();
         z.set_plot_range(min, max)
     }
+    pub fn set_canvas_range(&self, min: f64, max: f64) {
+        let mut z = self.0.borrow_mut();
+        z.set_canvas_range(min, max)
+    }
+
+    pub fn set<T, U>(self, name: T, value: U) -> Self
+    where
+        T: Into<String>,
+        U: Into<Value>,
+    {
+        {
+            let mut z = self.0.borrow_mut();
+            z.attributes.insert(name.into(), value.into());
+        }
+        self
+    }
+    fn svg(&self) -> Group {
+        let mut z = self.0.borrow();
+        z.svg()
+    }
 }
 
 #[derive(Debug, Clone, Default)]
@@ -131,12 +172,45 @@ impl AxisVertical {
         let mut z = self.0.borrow_mut();
         z.set_canvas_range(min, max)
     }
+    pub fn set<T, U>(self, name: T, value: U) -> Self
+    where
+        T: Into<String>,
+        U: Into<Value>,
+    {
+        {
+            let mut z = self.0.borrow_mut();
+            z.attributes.insert(name.into(), value.into());
+        }
+        self
+    }
+    fn svg(&self) -> Group {
+        let mut z = self.0.borrow();
+        z.svg()
+    }
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct Frame {
     pub horizontal: AxisHorizontal,
     pub vertical: AxisVertical,
+}
+impl Frame {
+    fn svg(&self) -> Group {
+        let mut group = Group::new();
+        let mut hsvg = self.horizontal.svg();
+        let mut vsvg = self.vertical.svg();
+        // hsvg.translate_xy(0.0, -self.vertical.project(0.0));
+        // vsvg.translate_xy(-self.horizontal.project(0.0), 0.0);
+        group.append(hsvg);
+        group.append(vsvg);
+        group
+    }
+}
+
+impl From<&Frame> for Box<(dyn Node + 'static)> {
+    fn from(val: &Frame) -> Self {
+        Box::new(val.svg())
+    }
 }
 
 #[derive(Debug, Clone, Default)]
@@ -220,6 +294,9 @@ impl Plot {
 
         for el in self.elements.iter() {
             group.append(el)
+        }
+        for f in self.frames.iter() {
+            group.append(f)
         }
         group
     }
