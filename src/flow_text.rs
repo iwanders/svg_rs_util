@@ -7,7 +7,7 @@ use svg::Node;
 pub struct FlowText {
     root: FlowRoot,
     region: FlowRegion,
-    para: FlowPara,
+    paragraphs: Vec<FlowPara>,
     attributes: Attributes,
 }
 
@@ -16,17 +16,25 @@ impl FlowText {
     where
         T: Into<String>,
     {
+        let text: String = text.into();
+
         let root = FlowRoot::new();
         let area = Rectangle::new().set("width", width).set("height", height);
-        let t = Text::new(text);
-        let para = FlowPara::new().add(t);
+
+        let mut paragraphs = vec![];
+        let z = text.split("\n");
+        for p in z {
+            let t = Text::new(p);
+            let para = FlowPara::new().add(t);
+            paragraphs.push(para);
+        }
 
         let region = FlowRegion::new().add(area);
 
         FlowText {
             root,
             region,
-            para,
+            paragraphs,
             attributes: Default::default(),
         }
     }
@@ -41,7 +49,9 @@ impl FlowText {
         }
 
         root.append(region);
-        root.append(self.para.clone());
+        for p in self.paragraphs.iter() {
+            root.append(p.clone());
+        }
         root.into()
     }
     pub fn set<T, U>(self, name: T, value: U) -> Self

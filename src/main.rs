@@ -384,7 +384,7 @@ fn make_flow_text() {
     use svg::node::element::{Path, Rectangle, Text};
     use svg_util::extensions::*;
     use svg_util::flow_text::FlowText;
-    let blob = "Lorem ipsum odor amet, consectetuer adipiscing elit. Magnis integer ipsum purus blandit lacus risus dapibus vulputate consectetur. Primis dui fermentum mattis; felis iaculis ultrices phasellus. Suspendisse vitae pharetra quis dis inceptos penatibus. Lacus suscipit efficitur potenti nunc sed. Tempor finibus litora congue hendrerit scelerisque sed dignissim. Senectus duis taciti ornare dui porttitor vulputate vivamus. Scelerisque ullamcorper praesent natoque dictum mollis orci mattis vestibulum.";
+    let blob = "Lorem ipsum odor amet, consectetuer adipiscing elit. Magnis integer ipsum purus blandit lacus risus dapibus vulputate consectetur. Primis dui fermentum mattis; felis iaculis ultrices phasellus. Suspendisse vitae pharetra quis dis inceptos penatibus.\nLacus suscipit efficitur potenti nunc sed. Tempor finibus litora congue hendrerit scelerisque sed dignissim. Senectus duis taciti ornare dui porttitor vulputate vivamus. Scelerisque ullamcorper praesent natoque dictum mollis orci mattis vestibulum.";
     let mut flow_text = FlowText::rectangle(300.0, 300.0, blob)
         .set("style", "text-anchor:start;text-align:justify;");
 
