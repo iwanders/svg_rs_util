@@ -142,7 +142,7 @@ impl AxisHorizontal {
         self
     }
     fn svg(&self) -> Group {
-        let mut z = self.0.borrow();
+        let z = self.0.borrow();
         z.svg()
     }
 }
@@ -184,7 +184,7 @@ impl AxisVertical {
         self
     }
     fn svg(&self) -> Group {
-        let mut z = self.0.borrow();
+        let z = self.0.borrow();
         z.svg()
     }
 }
@@ -197,8 +197,8 @@ pub struct Frame {
 impl Frame {
     fn svg(&self) -> Group {
         let mut group = Group::new();
-        let mut hsvg = self.horizontal.svg();
-        let mut vsvg = self.vertical.svg();
+        let hsvg = self.horizontal.svg();
+        let vsvg = self.vertical.svg();
         // hsvg.translate_xy(0.0, -self.vertical.project(0.0));
         // vsvg.translate_xy(-self.horizontal.project(0.0), 0.0);
         group.append(hsvg);
@@ -276,12 +276,13 @@ pub struct Plot {
 
 impl Plot {
     pub fn new(frame: &Frame) -> Self {
-        todo!("not ready for production yet");
+        let _ = frame;
         // Needs coordinate frame flip.
         Self {
             frames: vec![frame.clone()],
             elements: vec![],
-        }
+        };
+        todo!("not ready for production yet")
     }
 
     pub fn line_xy(&mut self, data: &[(f64, f64)]) -> DrawElementHandle {
