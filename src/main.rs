@@ -1,7 +1,9 @@
 use std::f64::consts::PI;
 use svg::node::element::Group;
 use svg::Document;
+use svg::Node;
 use svg_util::pie_chart::{PieChart, StartStyle};
+use svg_util::plot;
 use svg_util::tab::{Tab, TabEdge};
 use svg_util::transform::Transformed;
 
@@ -293,8 +295,51 @@ fn make_tab() {
     svg::save("/tmp/test_tab.svg", &document).expect("failed to write svg");
 }
 
+fn make_plot() {
+    use svg::node::element::path::Data;
+    use svg::node::element::Path;
+
+    let mut v = plot::AxisVertical::new(100.0);
+    let mut h = plot::AxisHorizontal::new(100.0);
+    // h.set_range(0.0, 7.0);
+    let f = v.combine(&h);
+    let mut p = plot::Plot::new(&f);
+    let mut data = vec![];
+    for i in 0..628 {
+        let t = i as f64 / 100.0;
+        data.push((t, t.sin()));
+    }
+    let el = p.line_xy(&data);
+
+    // p.add_frame(&h, &v);
+
+    let mut group = Group::new();
+    group.append(p);
+
+    /*
+    let data = Data::new()
+        .move_to((-1000, 1000))
+        .line_to((1000, 1000))
+        .line_to((1000, -1000))
+        .line_to((-1000, -1000))
+        .close();
+    let path = Path::new().set("fill", "black").set("d", data);
+    group.append(path);
+    */
+
+    let document = Document::new()
+        .set("viewBox", (-200, -200, 400, 400)) // from -200,-200, width and height of 400.
+        .set("width", "2000px")
+        .set("height", "2000px")
+        // .add(path)
+        .add(group);
+
+    svg::save("/tmp/test_plot.svg", &document).expect("failed to write svg");
+}
+
 fn main() {
     make_piechart();
     make_piechart_align_largest();
     make_tab();
+    make_plot();
 }
