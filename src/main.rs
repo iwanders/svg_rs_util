@@ -299,9 +299,10 @@ fn make_plot() {
     use svg::node::element::path::Data;
     use svg::node::element::Path;
 
-    let mut v = plot::AxisVertical::new(100.0);
+    let mut v = plot::AxisVertical::new(200.0);
+    v.set_range(-1.0, 1.0);
     let mut h = plot::AxisHorizontal::new(100.0);
-    // h.set_range(0.0, 7.0);
+    h.set_range(0.0, 7.0);
     let f = v.combine(&h);
     let mut p = plot::Plot::new(&f);
     let mut data = vec![];
@@ -341,5 +342,5 @@ fn main() {
     make_piechart();
     make_piechart_align_largest();
     make_tab();
-    make_plot();
+    // make_plot();
 }

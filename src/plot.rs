@@ -48,6 +48,7 @@ impl Axis {
     }
 
     fn project(&self, v: f64) -> f64 {
+        todo!("what semantics do we want here if range spans zero?");
         let shifted = v - self.range.min;
         let ratio = shifted / (self.range.max - self.range.min);
         let canvas_pos = ratio * self.canvas_length;
@@ -72,11 +73,12 @@ impl From<Axis> for Box<(dyn Node + 'static)> {
     }
 }
 
+use std::cell::RefCell;
 #[derive(Debug, Clone, Default)]
-pub struct AxisHorizontal(Rc<Axis>);
+pub struct AxisHorizontal(Rc<RefCell<Axis>>);
 impl AxisHorizontal {
     pub fn new(canvas_length: f64) -> Self {
-        Self(Rc::new(Axis::horizontal(canvas_length)))
+        Self(Rc::new(Axis::horizontal(canvas_length).into()))
     }
     pub fn combine(&self, vertical: &AxisVertical) -> Frame {
         Frame {
@@ -84,19 +86,22 @@ impl AxisHorizontal {
             horizontal: self.clone(),
         }
     }
-}
-impl std::ops::Deref for AxisHorizontal {
-    type Target = Axis;
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    fn project(&self, v: f64) -> f64 {
+        let z = self.0.borrow_mut();
+        z.project(v)
+    }
+
+    pub fn set_range(&self, min: f64, max: f64) {
+        let mut z = self.0.borrow_mut();
+        z.set_range(min, max)
     }
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct AxisVertical(Rc<Axis>);
+pub struct AxisVertical(Rc<RefCell<Axis>>);
 impl AxisVertical {
     pub fn new(canvas_length: f64) -> Self {
-        Self(Rc::new(Axis::vertical(canvas_length)))
+        Self(Rc::new(Axis::vertical(canvas_length).into()))
     }
     pub fn combine(&self, horizontal: &AxisHorizontal) -> Frame {
         Frame {
@@ -104,11 +109,14 @@ impl AxisVertical {
             vertical: self.clone(),
         }
     }
-}
-impl std::ops::Deref for AxisVertical {
-    type Target = Axis;
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    fn project(&self, v: f64) -> f64 {
+        let z = self.0.borrow_mut();
+        z.project(v)
+    }
+
+    pub fn set_range(&self, min: f64, max: f64) {
+        let mut z = self.0.borrow_mut();
+        z.set_range(min, max)
     }
 }
 
@@ -142,7 +150,7 @@ impl DrawElementHandle {
         let mut points = String::new();
         for (x, y) in self.data.iter() {
             let px = self.frame.horizontal.project(*x);
-            let py = self.frame.horizontal.project(*y);
+            let py = self.frame.vertical.project(*y);
             points += &format!("{},{} ", px, py);
         }
         let path = Polyline::new().set("points", points);
