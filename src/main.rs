@@ -348,7 +348,7 @@ fn make_plot() {
     */
 }
 
-fn make_flow_text() {
+fn make_flow_elements() {
     use svg::node::element::path::Data;
     use svg::node::element::{Path, Rectangle, Text};
     use svg_util::extensions::*;
@@ -376,12 +376,38 @@ fn make_flow_text() {
         // .add(path)
         .add(group);
 
-    svg::save("/tmp/test_flow_text.svg", &document).expect("failed to write svg");
+    svg::save("/tmp/test_flow_elements.svg", &document).expect("failed to write svg");
 }
+
+fn make_flow_text() {
+    use svg::node::element::path::Data;
+    use svg::node::element::{Path, Rectangle, Text};
+    use svg_util::extensions::*;
+    use svg_util::flow_text::FlowText;
+    let blob = "Lorem ipsum odor amet, consectetuer adipiscing elit. Magnis integer ipsum purus blandit lacus risus dapibus vulputate consectetur. Primis dui fermentum mattis; felis iaculis ultrices phasellus. Suspendisse vitae pharetra quis dis inceptos penatibus. Lacus suscipit efficitur potenti nunc sed. Tempor finibus litora congue hendrerit scelerisque sed dignissim. Senectus duis taciti ornare dui porttitor vulputate vivamus. Scelerisque ullamcorper praesent natoque dictum mollis orci mattis vestibulum.";
+    let mut flow_text = FlowText::rectangle(300.0, 300.0, blob)
+        .set("style", "text-anchor:start;text-align:justify;");
+
+    let mut group = Group::new();
+    group.append(flow_text);
+
+    group.translate_xy(-150.0, -150.0);
+
+    let document = Document::new()
+        .set("viewBox", (-200, -200, 400, 400)) // from -200,-200, width and height of 400.
+        .set("width", "2000px")
+        .set("height", "2000px")
+        // .add(path)
+        .add(group);
+
+    svg::save("/tmp/test_flow_elements.svg", &document).expect("failed to write svg");
+}
+
 fn main() {
     make_piechart();
     make_piechart_align_largest();
     make_tab();
     make_plot();
+    make_flow_elements();
     make_flow_text();
 }
