@@ -311,7 +311,11 @@ fn make_plot() {
         let t = i as f64 / 100.0;
         data.push((t, t.sin()));
     }
-    let el = p.line_xy(&data);
+    let mut el = p
+        .line_xy(&data)
+        .set("fill", "none")
+        .set("stroke", "navy")
+        .set("stroke-width", "5");
 
     // p.add_frame(&h, &v);
 

@@ -1,6 +1,6 @@
 use std::rc::Rc;
 use svg::node::element::{Group, Polyline};
-use svg::node::Node;
+use svg::node::{Attributes, Node, Value};
 
 #[derive(Debug, Copy, Clone, Default)]
 struct Range {
@@ -143,41 +143,51 @@ pub struct Frame {
 pub struct DrawElement {
     frame: Frame,
     data: Vec<(f64, f64)>,
+    attributes: Attributes,
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct DrawElementHandle(Rc<DrawElement>);
+pub struct DrawElementHandle(Rc<RefCell<DrawElement>>);
 
 impl DrawElementHandle {
     pub fn new(frame: &Frame, data: &[(f64, f64)]) -> DrawElementHandle {
-        Self(
-            DrawElement {
-                frame: frame.clone(),
-                data: data.to_vec(),
-            }
-            .into(),
-        )
+        Self(Rc::new(RefCell::new(DrawElement {
+            frame: frame.clone(),
+            data: data.to_vec(),
+            attributes: Default::default(),
+        })))
     }
     pub fn svg(&self) -> Group {
+        let z = self.0.borrow();
         let mut group = Group::new();
         let mut points = String::new();
-        for (x, y) in self.data.iter() {
-            let px = self.frame.horizontal.project(*x);
-            let py = self.frame.vertical.project(*y);
+        for (x, y) in z.data.iter() {
+            let px = z.frame.horizontal.project(*x);
+            let py = z.frame.vertical.project(*y);
             points += &format!("{},{} ", px, py);
         }
-        let path = Polyline::new().set("points", points);
+        let mut path = Polyline::new().set("points", points);
+        let attr = path.get_attributes_mut().unwrap();
+        for (k, v) in z.attributes.iter() {
+            attr.insert(k.clone(), v.clone());
+        }
         group.append(path);
         group
     }
-}
 
-impl std::ops::Deref for DrawElementHandle {
-    type Target = DrawElement;
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    pub fn set<T, U>(self, name: T, value: U) -> Self
+    where
+        T: Into<String>,
+        U: Into<Value>,
+    {
+        {
+            let mut z = self.0.borrow_mut();
+            z.attributes.insert(name.into(), value.into());
+        }
+        self
     }
 }
+
 impl From<&DrawElementHandle> for Box<(dyn Node + 'static)> {
     fn from(val: &DrawElementHandle) -> Self {
         Box::new(val.svg())
