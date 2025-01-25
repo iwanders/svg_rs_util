@@ -354,10 +354,11 @@ fn make_flow_text() {
     use svg_util::extensions::*;
 
     let mut root = FlowRoot::new().set("style", "text-anchor:start;text-align:justify;");
+    root.translate_xy(-150, -150);
     let mut region = FlowRegion::new().set("style", "text-anchor:start;text-align:justify;");
     let mut para = FlowPara::new();
 
-    let mut r = Rectangle::new().set("width", 100).set("height", 100);
+    let mut r = Rectangle::new().set("width", 300).set("height", 300);
     region.append(r);
 
     let t = Text::new("Lorem ipsum odor amet, consectetuer adipiscing elit. Magnis integer ipsum purus blandit lacus risus dapibus vulputate consectetur. Primis dui fermentum mattis; felis iaculis ultrices phasellus. Suspendisse vitae pharetra quis dis inceptos penatibus. Lacus suscipit efficitur potenti nunc sed. Tempor finibus litora congue hendrerit scelerisque sed dignissim. Senectus duis taciti ornare dui porttitor vulputate vivamus. Scelerisque ullamcorper praesent natoque dictum mollis orci mattis vestibulum.");

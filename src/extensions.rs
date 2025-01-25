@@ -4,8 +4,8 @@ use std::collections::hash_map::DefaultHasher;
 use svg::node::element::Element;
 use svg::node::{Attributes, Children, Node, NodeDefaultHash, Value};
 
+// https://github.com/bodoni/svg/blob/d58e91878b98f061b280caa0ab95bb460f2e422e/src/node/element/tag.rs#L127
 mod tag {
-
     macro_rules! implement {
         ($($const_name:ident: $tag_name:expr,)*) => ($(
             #[doc = $tag_name]
@@ -20,6 +20,7 @@ mod tag {
     }
 }
 
+// https://github.com/bodoni/svg/blob/d58e91878b98f061b280caa0ab95bb460f2e422e/src/node/element/mod.rs#L138
 macro_rules! implement_nested(
     ($struct_name:ident::$field_name:ident) => (
         implement_nested!($struct_name::$field_name []);
